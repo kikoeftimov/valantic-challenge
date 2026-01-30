@@ -6,26 +6,19 @@ RUN apt-get update && apt-get install -y \
     python3-pip \
     nodejs \
     npm \
-    cron \
     && rm -rf /var/lib/apt/lists/*
 
 # Working directory
 WORKDIR /app
 
-# Copy files
-COPY sample-bash-script.sh sample-python-script.py sample-node-script.js /app/
+# Copy the script, Python and Node.js apps
+COPY sample-python-script.py sample-node-script.js start-servers.sh /app/
 
 # Make shell script executable
-RUN chmod +x /app/sample-bash-script.sh
+RUN chmod +x /app/start-servers.sh
 
-# Create log file
-RUN touch /var/log/app.log
+# Expose ports used by the apps
+EXPOSE 3000 8080
 
-# Add cron job
-RUN echo "* * * * * /app/sample-bash-script.sh >> /var/log/app.log 2>&1" > /etc/cron.d/app-cron \
-    && chmod 0644 /etc/cron.d/app-cron \
-    && crontab /etc/cron.d/app-cron
-
-# Run cron in foreground
-CMD ["cron", "-f"]
-
+# Start both servers when container runs
+CMD ["/app/start-servers.sh"]
