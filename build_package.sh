@@ -28,7 +28,7 @@ VERSION=$("./$VERSION_SCRIPT")
 # Get the current timestamp
 TIMESTAMP=$(date +"%Y%m%d_%H%M")
 
-# Set the filename
+# Set the filename (Archive name)
 FILENAME="app-$VERSION-$TIMESTAMP.tgz"
 log "Packaging into archive: $FILENAME"
 
@@ -44,10 +44,19 @@ fi
 
 log "Start packaging process..."
 
+RELEASE_FOLDER_NAME="release"
+mkdir -p $RELEASE_FOLDER_NAME
+
+# Use the specified parameter from cmd line or dev as default
+ENVIRONMENT=${1:-dev}
+
 # Package all files into .tar.gz
-if tar --exclude-from=$EXCLUDED_LIST -czvf $FILENAME $(find . \( -name '*.js' -o -name '*.py' -o -name '*.sh' \) -type f); then
+if tar --exclude-from=$EXCLUDED_LIST -czvf $RELEASE_FOLDER_NAME/$FILENAME $(find . \( -name '*.js' -o -name '*.py' -o -name '*.sh' \) -type f); then
   log "Packaging successful."
   echo >> "$LOG_FILE"
+
+  # Depending on the environment, copy the tarball into a specific folder
+  cp $RELEASE_FOLDER_NAME/$FILENAME 'deploy/'$ENVIRONMENT
 else
   log "Error: Packaging failed."
   echo >> "$LOG_FILE"

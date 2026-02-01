@@ -22,6 +22,6 @@ while read -r a; do
   [ -z "$a" ] && continue
   
   # Remove the artifact
-  rm -rf $a
+  rm -rf 'release/'$a
 done < "$ARTIFACTS_LIST"
 log "Old artifacts cleaned!"
